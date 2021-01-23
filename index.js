@@ -132,7 +132,7 @@ io.on("connection",(socket)=>{
                 }); 
             }
             if(status === 0){
-                io.to(response_receiver.socket_id).emit("update",{user_id,status});
+                io.to(response_receiver.socket_id).emit("update",{user_id:from.user_id,status});
             }
         }
     }); 
