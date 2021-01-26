@@ -15,7 +15,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server,{
     cors: {
-    origin: "http://localhost:3000",
+    origin: "*", // put frontend url in production 
     credentials: true
     }}
 ); 
@@ -91,13 +91,6 @@ io.on("connection",(socket)=>{
     socket.on("invite",(inviteObject,callBack)=>{
         const { from, to, room_id, group_id } = inviteObject; 
         
-        /* Needed ???? */
-        // if( from.user_id === to.user_id) { 
-        //     socket.join(room_id); 
-        //     callBack();
-        //     return;  
-        // }  
-
         const invite_receiver = getRequestListener({user_id:to.user_id, group_id}); 
         if(invite_receiver) { 
             //relay invite to friend 
@@ -113,29 +106,36 @@ io.on("connection",(socket)=>{
     socket.on("update",(responseObject,callBack) => { 
         
         const { group_id, from, to, status} = responseObject; 
-        const response_receiver = getRequestSender({user_id:to.user_id,group_id});
-        if(response_receiver) { 
+        const update_receiver = getRequestSender({user_id:to.user_id,group_id});
+
+        if(update_receiver) { 
             if(status === 1) { 
-                io.to(response_receiver.socket_id).emit("start",{ // To Sender
+                io.to(update_receiver.socket_id).emit("start",{ // To Request Sender
                     opponent : {
-                        user_id : from.user_id,
-                        name: from.name,
-                        socket_id : socket.id 
+                        opponent_user_id : from.user_id,
+                        opponent_name: from.name,
+                        opponent_socket_id : socket.id,
+                        turn:1 //Request sender gets the first  turn 
                     }
                 }); 
-                io.to(socket.id).emit("start",{  //To Listener
+                io.to(socket.id).emit("start",{  //To Request Laistener
                     opponent : {
-                        user_id : to.user_id,
-                        name: to.name,
-                        socket_id : response_receiver.socket_id 
+                        opponent_user_id : to.user_id,
+                        opponent_name: to.name,
+                        opponent_socket_id : update_receiver.socket_id,
+                        turn:0 
                     }
                 }); 
-            }
-            if(status === 0){
-                io.to(response_receiver.socket_id).emit("update",{user_id:from.user_id,status});
+            } else {
+                io.to(update_receiver.socket_id).emit("update",{user_id:from.user_id,status});
             }
         }
     }); 
+
+    socket.on("game-step",(data)=>{
+        const {to,cell_no} = data; 
+        io.to(to.socket_id).emit("game-step",{cell_no}); 
+    })
 })
 
 const PORT = process.env.PORT || 5000; 
