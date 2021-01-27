@@ -132,9 +132,15 @@ io.on("connection",(socket)=>{
         }
     }); 
 
+
+    //After game starts 
     socket.on("game-step",(data)=>{
         const {to,cell_no} = data; 
         io.to(to.socket_id).emit("game-step",{cell_no}); 
+    })
+    socket.on("game-message",(data)=>{
+        const {to,message} = data; 
+        io.to(to.socket_id).emit("game-message",{message}); 
     })
 })
 
