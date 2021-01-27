@@ -37,8 +37,12 @@ const {
     getRequestListener 
 } = require("./controllers/requestListener")
 
-const { isNullOrUndefined } = require("util");
-const { response } = require("express");
+// const { isNullOrUndefined } = require("util");
+// const { response } = require("express");
+
+app.get("/",(req,res)=>{
+    res.send("Server for online tic tac toe is up and running"); 
+}); 
 
 io.on("connection",(socket)=>{
 
