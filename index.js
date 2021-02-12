@@ -36,7 +36,12 @@ const {
     getListeners, 
     getRequestListener 
 } = require("./controllers/requestListener")
-
+const { 
+    addOnlinePlayer,
+    removeOnlinePlayer,
+    getOnlinePlayer,
+    getOnlinePlayers
+} = require("./controllers/onlinePlaying"); 
 // const { isNullOrUndefined } = require("util");
 // const { response } = require("express");
 
@@ -64,7 +69,8 @@ io.on("connection",(socket)=>{
         socket.join(`${group_id}-senders`); 
         //socket.join(`${group_id}-${user_id}`); // request senders join 
         const listenersOnline = getListeners(group_id); 
-        callBack(listenersOnline); 
+        const onlinePlaying = getOnlinePlayers(group_id); 
+        callBack(listenersOnline,onlinePlaying); 
     })
     socket.on('leave-request-sender',(details,callBack)=>{
         const { user_id, group_id } = details; 
@@ -137,7 +143,20 @@ io.on("connection",(socket)=>{
     }); 
 
 
-    //After game starts 
+    //After game starts     
+    socket.on("game-status",(details)=>{
+        const { user_id, group_id, status_message } = details; 
+        if(status_message === "joined"){ 
+            io.to(`${group_id}-senders`).emit('update',{user_id,status:3});
+            addOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
+        } 
+        if(status_message === "left"){ 
+            io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
+            removeOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
+        }  
+    })
+
+    //Between 2 people currently in the game
     socket.on("game-step",(data)=>{
         const {to,cell_no} = data; 
         io.to(to.socket_id).emit("game-step",{cell_no}); 
