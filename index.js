@@ -54,7 +54,8 @@ app.get("/",(req,res)=>{
 
 app.post("/postanything",(req,res)=>{
     console.log("Data from post anything: ");
-    console.log(req.body.data); 
+    console.log("Data" , req.body.data); 
+    console.log("Cookies " , req.body.cookie); 
     res.json({
         success:1 
     })
