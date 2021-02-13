@@ -45,6 +45,9 @@ const {
 // const { isNullOrUndefined } = require("util");
 // const { response } = require("express");
 
+app.use(express.json());
+app.use(express.urlencoded({extended: true})); 
+
 app.get("/",(req,res)=>{
     res.send("Server for online tic tac toe is up and running"); 
 }); 
