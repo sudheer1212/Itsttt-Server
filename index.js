@@ -49,6 +49,14 @@ app.get("/",(req,res)=>{
     res.send("Server for online tic tac toe is up and running"); 
 }); 
 
+app.post("/postanything",(req,res)=>{
+    console.log("Data from post anything: ");
+    console.log(req.body.data); 
+    res.json({
+        success:1 
+    })
+})
+
 io.on("connection",(socket)=>{
 
     //NOT USING GLOBAL ROOM FOR NOW 
