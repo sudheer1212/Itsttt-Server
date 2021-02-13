@@ -56,6 +56,7 @@ app.post("/postanything",(req,res)=>{
     console.log("Data from post anything: ");
     console.log("Data" , req.body.data); 
     console.log("Cookies " , req.body.cookie); 
+    console.log(req.body); 
     res.json({
         success:1 
     })
