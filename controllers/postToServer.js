@@ -20,11 +20,11 @@ const postData = async (body,route) => {
     }
 }
 
-const shareMessageToGroup = async(uuid, group_id, message) => { 
+const shareMessageToGroup = async(uuid, groupId, message) => { 
     try { 
         const body = {
             uuid, 
-            group_id,
+            groupId,
             message
         }
         const route = 'sendGameNotification';  
