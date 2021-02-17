@@ -11,7 +11,8 @@ const postData = async (body,route) => {
     const api = `${API_TO_CALL}/${route}`
     try { 
         const response = await axios.post(api,body);
-        console.log(response.data);  
+        console.log("Printing response \n \n \n \n "); 
+        console.log(JSON.stringify(response.data));  
         return response.data; 
     } catch (err) { 
         console.log("Problem while sending post request"); 
