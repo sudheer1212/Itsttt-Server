@@ -5,7 +5,7 @@ const API_TO_CALL =
 (process.env.GA_PROD_API) : 
 (process.env.GA_DEV_API); 
 
-
+console.log(`Using ${API_TO_CALL}`); 
 const postData = async (body,route) => { 
     console.log("I am here"); 
     const api = `${API_TO_CALL}/${route}`
