@@ -1,8 +1,8 @@
+require("dotenv").config(); 
 const express = require("express"); 
 const socketio = require("socket.io"); 
 const http = require("http");
 const cors = require('cors');
-
 
 const app = express(); 
 app.use(cors());
@@ -42,6 +42,9 @@ const {
     getOnlinePlayer,
     getOnlinePlayers
 } = require("./controllers/onlinePlaying"); 
+const {
+    shareMessageToGroup
+} = require("./controllers/postToServer"); 
 // const { isNullOrUndefined } = require("util");
 // const { response } = require("express");
 
@@ -51,16 +54,7 @@ app.use(express.urlencoded({extended: true}));
 app.get("/",(req,res)=>{
     res.send("Server for online tic tac toe is up and running"); 
 }); 
-
-app.post("/postanything",(req,res)=>{
-    console.log("Data from post anything: ");
-    console.log("Data" , req.body.data); 
-    console.log("Cookies " , req.body.cookie); 
-    console.log(req.body); 
-    res.json({
-        success:1 
-    })
-})
+ 
 
 io.on("connection",(socket)=>{
 
@@ -130,7 +124,6 @@ io.on("connection",(socket)=>{
         
         const { group_id, from, to, status} = responseObject; 
         const update_receiver = getRequestSender({user_id:to.user_id,group_id});
-
         if(update_receiver) { 
             if(status === 1) { 
                 io.to(update_receiver.socket_id).emit("start",{ // To Request Sender
@@ -152,21 +145,26 @@ io.on("connection",(socket)=>{
             } else {
                 io.to(update_receiver.socket_id).emit("update",{user_id:from.user_id,status});
             }
+            
         }
     }); 
 
 
     //After game starts     
     socket.on("game-status",(details)=>{
-        const { user_id, group_id, status_message } = details; 
+        const { user_id, group_id, status_message, sharePlayMessageToGroup } = details; 
         if(status_message === "joined"){ 
             io.to(`${group_id}-senders`).emit('update',{user_id,status:3});
-            addOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
+            addOnlinePlayer({user_id, group_id, socket_id:socket.id});
         } 
         if(status_message === "left"){ 
             io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
             removeOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
         }  
+        if(sharePlayMessageToGroup){
+            console.log("q");
+            shareMessageToGroup(user_id, group_id, sharePlayMessageToGroup); 
+        }
     })
 
     //Between 2 people currently in the game
