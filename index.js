@@ -162,10 +162,10 @@ io.on("connection",(socket)=>{
             removeOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
         }  
         if(sharePlayMessageToGroup){
-            console.log("q");
+            console.log("Sending message to group");
             shareMessageToGroup(user_id, group_id, sharePlayMessageToGroup); 
         }
-    })
+    });
 
     //Between 2 people currently in the game
     socket.on("game-step",(data)=>{

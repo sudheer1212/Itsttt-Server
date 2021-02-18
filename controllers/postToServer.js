@@ -7,15 +7,14 @@ const API_TO_CALL =
 
 console.log(`Using ${API_TO_CALL}`); 
 const postData = async (body,route) => { 
-    console.log("I am here"); 
     const api = `${API_TO_CALL}/${route}`
     try { 
         const response = await axios.post(api,body);
-        console.log("Printing response \n \n \n \n "); 
+        console.log("Printing response :"); 
         console.log(JSON.stringify(response.data));  
         return response.data; 
     } catch (err) { 
-        console.log("Problem while sending post request"); 
+        console.log("Problem while sending post request,console log from postData func"); 
         console.log(err); 
         return 0; 
     }
@@ -26,7 +25,8 @@ const shareMessageToGroup = async(uuid, groupId, message) => {
         const body = {
             uuid, 
             groupId,
-            message
+            message,
+            gameName: "TicTacToe"
         }
         const route = 'sendGameNotification';  
         const res = await postData(body,route); 
