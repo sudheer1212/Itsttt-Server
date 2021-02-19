@@ -188,30 +188,33 @@ io.on("connection",(socket)=>{
         const {to,cell_no} = data; 
         io.to(to.socket_id).emit("game-step",{cell_no}); 
     }); 
-
-    socket.on("disconnect",()=>{ 
-        const data = getSocketData(socket.id);
-        if(data) { 
-            const { user_id, group_id } = data
-            //tell opponents you lost internet
-            if(data.opponentSockets) { 
-                data.opponentSockets.forEach( (id) => {
-                    io.to(id).emit("game-status",{opponent_status:"lostInternet"}); 
-                });
-            }
+    
+    // UNDER TEST 
+    // socket.on("disconnect",()=>{ 
+    //     const data = getSocketData(socket.id);
+    //     if(data) { 
+    //         const { user_id, group_id } = data
             
-            //tell request senders you are offline 
-            io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
+    //         // TEST THIS FIRST 
+    //         // //tell opponents you lost internet
+    //         // if(data.opponentSockets) { 
+    //         //     data.opponentSockets.forEach( (id) => {
+    //         //         io.to(id).emit("game-status",{opponent_status:"lostInternet"}); 
+    //         //     });
+    //         // }
             
-            //reset status so that if new sender gets proper info 
-            resetStatus(user_id,group_id); 
+    //         //tell request senders you are offline 
+    //         io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
+            
+    //         //reset status so that if new sender gets proper info 
+    //         resetStatus(user_id,group_id); 
 
-            console.log("SOMEONE LOST SOCKET CONNECTION"); 
-            //remove socket data from hash 
-            removeSocketData(socket.id); 
-        } 
+    //         console.log("SOMEONE DISCONNECTED SOCKET CONNECTION"); 
+    //         //remove socket data from hash 
+    //         removeSocketData(socket.id); 
+    //     } 
         
-    })
+    // })
 })
 
 const PORT = process.env.PORT || 5000; 
