@@ -192,10 +192,10 @@ io.on("connection",(socket)=>{
     socket.on("disconnect",()=>{ 
         const data = getSocketData(socket.id);
         if(data) { 
-            const { user_id, group_id, opponentSockets } = data
+            const { user_id, group_id } = data
             //tell opponents you lost internet
-            if(opponentSockets) { 
-                opponentSockets.forEach( (id) => {
+            if(data.opponentSockets) { 
+                data.opponentSockets.forEach( (id) => {
                     io.to(id).emit("game-status",{opponent_status:"lostInternet"}); 
                 });
             }
