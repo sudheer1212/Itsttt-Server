@@ -189,6 +189,9 @@ io.on("connection",(socket)=>{
         io.to(to.socket_id).emit("game-step",{cell_no}); 
     }); 
     
+    socket.on("disconnect",(reason)=>{
+        console.log(`DISCONNECT REASON :${reason}`); 
+    })
     // UNDER TEST 
     // socket.on("disconnect",()=>{ 
     //     const data = getSocketData(socket.id);
