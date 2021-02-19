@@ -10,7 +10,7 @@ const postData = async (body,route) => {
     const api = `${API_TO_CALL}/${route}`
     try { 
         const response = await axios.post(api,body);
-        console.log("Printing response :"); 
+        console.log("Printing response from sending game notification :"); 
         console.log(JSON.stringify(response.data));  
         return response.data; 
     } catch (err) { 
@@ -26,7 +26,7 @@ const shareMessageToGroup = async(uuid, groupId, message) => {
             uuid, 
             groupId,
             message,
-            gameName: "TicTacToe"
+            gameName: "tictactoe"
         }
         const route = 'sendGameNotification';  
         const res = await postData(body,route); 

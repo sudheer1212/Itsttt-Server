@@ -26,25 +26,34 @@ const {
 } = require("./controllers/globalUserController");
 
 const { 
+    resetStatus, 
     addRequestSender,
     removeRequestSender,
     getRequestSender
-} = require("./controllers/requestSender")
+} = require("./controllers/globalStatusController"); //require("./controllers/requestSender")
 const {
     addRequestListener,
     removeRequestListener,
     getListeners, 
     getRequestListener 
-} = require("./controllers/requestListener")
+} = require("./controllers/globalStatusController"); //require("./controllers/requestListener")
 const { 
     addOnlinePlayer,
     removeOnlinePlayer,
-    getOnlinePlayer,
     getOnlinePlayers
-} = require("./controllers/onlinePlaying"); 
+} = require("./controllers/globalStatusController"); //require("./controllers/onlinePlaying"); 
+
 const {
     shareMessageToGroup
-} = require("./controllers/postToServer"); 
+} = require("./controllers/postToServer");
+
+const {
+    setSocketData,
+    getSocketData,
+    removeSocketData,
+    setOpponentSockets,
+    resetOpponentSockets 
+} = require("./controllers/socketDataHash"); 
 // const { isNullOrUndefined } = require("util");
 // const { response } = require("express");
 
@@ -59,7 +68,8 @@ app.get("/",(req,res)=>{
 io.on("connection",(socket)=>{
 
     //NOT USING GLOBAL ROOM FOR NOW 
-    socket.on("global-room",({user_id,name},callBack)=>{
+    socket.on("global-room",({user_id,name,group_id},callBack)=>{
+        setSocketData(socket.id, user_id, group_id)
         const user = addUser({user_id, name, socket_id:socket.id}); 
         callBack(user); 
     }); 
@@ -81,7 +91,8 @@ io.on("connection",(socket)=>{
     })
     socket.on('leave-request-sender',(details,callBack)=>{
         const { user_id, group_id } = details; 
-        removeRequestSender({user_id,group_id}); 
+        resetStatus(user_id,group_id); 
+        //removeRequestSender({user_id,group_id}); 
         socket.leave(`${group_id}-senders`); 
         callBack(); 
     })
@@ -97,7 +108,8 @@ io.on("connection",(socket)=>{
 
     socket.on('leave-request-listener',(details,callBack)=>{
         const { user_id, group_id } = details; 
-        removeRequestListener({user_id,group_id}); 
+        resetStatus(user_id,group_id); 
+        //removeRequestListener({user_id,group_id}); 
         socket.leave(`${group_id}-listeners`); 
         io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
         callBack(); 
@@ -152,29 +164,53 @@ io.on("connection",(socket)=>{
 
     //After game starts     
     socket.on("game-status",(details)=>{
-        const { user_id, group_id, status_message, sharePlayMessageToGroup } = details; 
+        const { user_id, group_id, status_message, sharePlayMessageToGroup, opponent_socket_id } = details; 
         if(status_message === "joined"){ 
             io.to(`${group_id}-senders`).emit('update',{user_id,status:3});
             addOnlinePlayer({user_id, group_id, socket_id:socket.id});
+            setOpponentSockets(socket.id, [opponent_socket_id]); 
         } 
         if(status_message === "left"){ 
             io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
-            removeOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
+            io.to(opponent_socket_id).emit("game-status",{opponent_status:"left"})
+            resetStatus(user_id,group_id); 
+            //removeOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
+            resetOpponentSockets(socket.id); 
         }  
         if(sharePlayMessageToGroup){
-            console.log("Sending message to group");
             shareMessageToGroup(user_id, group_id, sharePlayMessageToGroup); 
         }
+        
     });
 
     //Between 2 people currently in the game
     socket.on("game-step",(data)=>{
         const {to,cell_no} = data; 
         io.to(to.socket_id).emit("game-step",{cell_no}); 
-    })
-    socket.on("game-message",(data)=>{
-        const {to,message} = data; 
-        io.to(to.socket_id).emit("game-message",{message}); 
+    }); 
+
+    socket.on("disconnect",()=>{ 
+        const data = getSocketData(socket.id);
+        if(data) { 
+            const { user_id, group_id, opponentSockets } = data
+            //tell opponents you lost internet
+            if(opponentSockets) { 
+                opponentSockets.forEach( (id) => {
+                    io.to(id).emit("game-status",{opponent_status:"lostInternet"}); 
+                });
+            }
+            
+            //tell request senders you are offline 
+            io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
+            
+            //reset status so that if new sender gets proper info 
+            resetStatus(user_id,group_id); 
+
+            console.log("SOMEONE LOST SOCKET CONNECTION"); 
+            //remove socket data from hash 
+            removeSocketData(socket.id); 
+        } 
+        
     })
 })
 
