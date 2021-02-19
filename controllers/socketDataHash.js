@@ -30,7 +30,7 @@ const setOpponentSockets = (socket_id,arr) => { //array
 }
 
 const resetOpponentSockets = (socket_id) => {
-    if(socketDataHash[socket_id].opponentSockets) {
+    if(socketDataHash[socket_id]) {
         socketDataHash[socket_id].opponentSockets = null; 
     }
 }
