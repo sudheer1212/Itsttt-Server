@@ -26,7 +26,9 @@ const removeSocketData = (socket_id) => {
 }
 
 const setOpponentSockets = (socket_id,arr) => { //array 
-    socketDataHash[socket_id].opponentSockets = arr; 
+    if(socketDataHash[socket_id]) {
+        socketDataHash[socket_id].opponentSockets = arr; 
+    }
 }
 
 const resetOpponentSockets = (socket_id) => {
