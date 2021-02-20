@@ -30,6 +30,7 @@ const log = (a,b) => {
 let globalStatusObject = { 
 
 }
+
 const updatePlayerStatus = (user_id,group_id,socket_id,status) => { 
     if(!globalStatusObject[group_id]) {
         globalStatusObject[group_id] = {}; 
@@ -41,7 +42,18 @@ const updatePlayerStatus = (user_id,group_id,socket_id,status) => {
     return 1; 
 }; 
 
+// const updatePlayerSocket = (user_id,group_id,socket_id) => { 
+//     if(!globalStatusObject[group_id]) {
+//         globalStatusObject[group_id] = {}; 
+//     }
+//     if(globalStatusObject[group_id][user_id]) {
+//         globalStatusObject[group_id][user_id].socket_id = socket_id; 
+//     }
+//     return 1; 
+// }; 
+
 const resetStatus = (user_id,group_id) => {
+    console.log(`Offline ${user_id}`); 
     if(!globalStatusObject[group_id] || !globalStatusObject[group_id][user_id]) {
         return ; 
     }
@@ -80,29 +92,14 @@ const addRequestSender = ({user_id,group_id,socket_id}) => {
     updatePlayerStatus(user_id,group_id,socket_id,4); 
 }
 
-const removeRequestSender = ({user_id,group_id}) => {
-    log(user_id,"left sender");  
-    resetStatus(user_id,group_id); 
-}
-
 const addRequestListener = ({user_id,group_id,socket_id}) => { 
     log(user_id,"joined listener");  
     updatePlayerStatus(user_id,group_id,socket_id,1); 
 }
 
-const removeRequestListener = ({user_id,group_id}) => { 
-    log(user_id,"left listener"); 
-    resetStatus(user_id,group_id); 
-}
-
 const addOnlinePlayer = ({user_id,group_id,socket_id}) => { 
     log(user_id,"joined player"); 
     updatePlayerStatus(user_id,group_id,socket_id,3); 
-}
-
-const removeOnlinePlayer = ({user_id,group_id,socket_id}) => { 
-    log(user_id,"left player"); 
-    resetStatus(user_id,group_id); 
 }
 
 const getRequestSender = ({user_id,group_id}) => { 
@@ -133,14 +130,31 @@ const getOnlinePlayers = (group_id) => {
 
 module.exports = { 
     addRequestSender,
-    removeRequestSender,
     getRequestSender,
     addRequestListener,
-    removeRequestListener,
     getListeners, 
     getRequestListener,
     addOnlinePlayer,
-    removeOnlinePlayer,
     getOnlinePlayers,
     resetStatus
 }
+
+/*
+OLD
+
+const removeRequestSender = ({user_id,group_id}) => {
+    log(user_id,"left sender");  
+    resetStatus(user_id,group_id); 
+}
+
+const removeOnlinePlayer = ({user_id,group_id,socket_id}) => { 
+    log(user_id,"left player"); 
+    resetStatus(user_id,group_id); 
+}
+
+
+const removeRequestListener = ({user_id,group_id}) => { 
+    log(user_id,"left listener"); 
+    resetStatus(user_id,group_id); 
+}
+*/

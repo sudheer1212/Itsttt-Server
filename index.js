@@ -33,13 +33,11 @@ const {
 } = require("./controllers/globalStatusController"); //require("./controllers/requestSender")
 const {
     addRequestListener,
-    removeRequestListener,
     getListeners, 
     getRequestListener 
 } = require("./controllers/globalStatusController"); //require("./controllers/requestListener")
 const { 
     addOnlinePlayer,
-    removeOnlinePlayer,
     getOnlinePlayers
 } = require("./controllers/globalStatusController"); //require("./controllers/onlinePlaying"); 
 
@@ -66,6 +64,10 @@ app.get("/",(req,res)=>{
  
 
 io.on("connection",(socket)=>{
+
+    let handshakeQuery = socket.handshake.query;
+    const { user_id,name } = handshakeQuery;
+    console.log(`CONNECTED ${name} ${user_id} with socket ${socket.id}`); 
 
     //NOT USING GLOBAL ROOM FOR NOW 
     socket.on("global-room",({user_id,name,group_id},callBack)=>{
@@ -190,8 +192,11 @@ io.on("connection",(socket)=>{
     }); 
     
     socket.on("disconnect",(reason)=>{
-        console.log(`DISCONNECT REASON :${reason}`); 
+        const {name} = getSocketData(socket.id);
+        console.log(`DISCONNECT ${name} REASON :${reason}`); 
     })
+
+
     // UNDER TEST 
     // socket.on("disconnect",()=>{ 
     //     const data = getSocketData(socket.id);
