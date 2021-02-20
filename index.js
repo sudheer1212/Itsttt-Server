@@ -64,8 +64,11 @@ app.get("/",(req,res)=>{
  
 io.use((socket, next) => {
     io.engine.generateId = () => {
-      const {user_id,group_id } = socket.handshake.query;   
-      return `${group_id}-${user_id}`
+      const data = socket.handshake.query; 
+      const {user_id, group_id} = data;   
+      const socket_id_generated = `${group_id}-${user_id}`; 
+      console.log(socket_id_generated, " Generated "); 
+      return socket_id_generated; 
     }
     next(null, true);
 });
