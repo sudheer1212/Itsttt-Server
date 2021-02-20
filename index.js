@@ -62,6 +62,13 @@ app.get("/",(req,res)=>{
     res.send("Server for online tic tac toe is up and running"); 
 }); 
  
+io.use((socket, next) => {
+    io.engine.generateId = () => {
+      const {user_id,group_id } = socket.handshake.query;   
+      return `${group_id}-${user_id}`
+    }
+    next(null, true);
+});
 
 io.on("connection",(socket)=>{
 
