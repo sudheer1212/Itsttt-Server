@@ -192,8 +192,14 @@ io.on("connection",(socket)=>{
     }); 
     
     socket.on("disconnect",(reason)=>{
-        const {name} = getSocketData(socket.id);
-        console.log(`DISCONNECT ${name} REASON :${reason}`); 
+        const data = getSocketData(socket.id);
+        if(data) { 
+            const {name,user_id} = data
+            console.log(`DISCONNECT ${name} REASON :${reason}`);
+        } else { 
+            console.log(`DISCONNECT WITH UNKNOWN`); 
+        }
+         
     })
 
 

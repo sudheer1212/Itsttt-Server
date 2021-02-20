@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dep": "git push heroku master"
+    "dep": "git push heroku master",
+    "log": "heroku logs --tail -a itsttt"
   },
   "author": "",
   "license": "ISC",
