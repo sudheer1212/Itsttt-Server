@@ -7,7 +7,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devremote": "heroku git:remote -a itsttt-dev",
+    "prodrempte": "heroku git:remote -a itsttt-dev",
+    "dep": "git push heroku master",
+    "log": "heroku logs --tail -a itsttt",
+    "logdev": "heroku logs --tail -a itsttt-dev"
   },
   "author": "",
   "license": "ISC",
