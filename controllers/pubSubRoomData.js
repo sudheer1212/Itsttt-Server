@@ -31,6 +31,13 @@ const makeRoomIfNotExists = (room) => {
     }
 }
 
+const checkRoomExists = (room) => {
+    if(pubSubRooms[room]){
+        return 1; 
+    }
+    return 0; 
+}
+
 const publishService = (room, userId, eventName, data) => { 
     let n = pubSubRooms[room].psArray.length; 
     pubSubRooms[room].psArray.push({
@@ -59,5 +66,6 @@ const deletePubSubRoom = (room) => {
 module.exports = {
     publishService,
     subscribeService,
-    makeRoomIfNotExists
+    makeRoomIfNotExists,
+    checkRoomExists
 }

@@ -32,6 +32,8 @@ const {
     resetOpponentSockets 
 } = require("../controllers/socketDataHash"); 
 
+const pubSubRoomData = require("../controllers/pubSubRoomData"); 
+
 module.exports = (io) => {
     
     io.on("connection",(socket)=>{
@@ -119,18 +121,20 @@ module.exports = (io) => {
                         opponent : {
                             opponent_user_id : from.user_id,
                             opponent_name: from.name,
-                            turn:1, //Request sender gets the first  turn
-                            gameId 
-                        }
+                            turn:1 //Request sender gets the first  turn
+                        },
+                        gameId : gameId
                     }); 
                     io.to(socket.id).emit("start",{  //To Request Laistener
                         opponent : {
                             opponent_user_id : to.user_id,
                             opponent_name: to.name,
-                            turn:0,
-                            gameId
-                        }
+                            turn:0
+                        },
+                        gameId : gameId
                     }); 
+                    pubSubRoomData.makeRoomIfNotExists(gameId); 
+                    
                 } else {
                     io.to(update_receiver.socket_id).emit("update",{user_id:from.user_id,status});
                 }

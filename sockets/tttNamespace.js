@@ -16,25 +16,42 @@ const {
     resetOpponentSockets 
 } = require("../controllers/socketDataHash"); 
 
-const pubSubRoomData = require("../controllers/pubSubRoomData"); 
+const pubSubRoomData = require("../controllers/pubSubRoomData");
+const colors = require('colors');
+
+//const { colors } =  require("../methods/debugColours"); 
 
 module.exports = (io) => { 
-
+     
     const tttNamespace = io.of("/ttt"); 
+
+    // io.of("/ttt").use((socket, next) => {
+    //     console.log(`Handshake query ${JSON.stringify(handshakeQuery)}`); 
+    //     const handshakeQuery = socket.handshake.query;
+    //     const gameId = handshakeQuery.gameId;
+    //     next(); 
+    //     if(gameId && pubSubRoomData.checkRoomExists(gameId)){
+    //         next()
+    //     } else {
+    //         console.log(`INVALID GAME ID ${gameId}`); 
+    //     }
+    // });
+
     io.of("/ttt").on("connection",(socket)=>{
         let handshakeQuery = socket.handshake.query;
         const { user_id, group_id, name, gameId } = handshakeQuery;
         console.log(`Handshake query ${JSON.stringify(handshakeQuery)}`); 
-        console.log(`Joined game id ${gameId}`); 
-        socket.join(gameId); 
+
+        console.log(colors.bold.red(`Joined game id ${gameId}`)); 
         pubSubRoomData.makeRoomIfNotExists(gameId); 
-        
+        socket.join(gameId); 
+
         addOnlinePlayer({user_id, group_id, socket_id:socket.id});
         io.to(`${group_id}-senders`).emit('update',{user_id,status:3});
-        tttNamespace.to(group_id).emit("game-status", {opponent_status : "connected"}); 
+        socket.broadcast.to(gameId).emit("game-status", {opponent_status : "connected", by: user_id}); 
 
-        socket.on("reconnected-user",(lastKnownMessageId)=>{
-            let arrayToSubscribe = pubSubRoomData.subscribeService(gameId, lastKnownMessageId); 
+        socket.on("reconnected-user",(askFromMsgId)=>{  
+            let arrayToSubscribe = pubSubRoomData.subscribeService(gameId, askFromMsgId); 
             arrayToSubscribe.forEach((x) => {
                 socket.to(socket.id).emit(x.eventName,{
                     data  : x.data, 
@@ -64,13 +81,9 @@ module.exports = (io) => {
             
         }); 
         
-        // socket.on("disconnecting", (reason)=>{
-        //     console.log(`DISCONNECTING TTT ROOMS:${socket.rooms} REASON :${reason}`);
-        //     let rooms = socket.rooms;
-        //     rooms.forEach(room => {
-        //         console.log(`ROOM ${room}`); 
-        //     });
-        // })
+        socket.on("disconnecting", (reason)=>{
+            console.log(`SOMEONE IS DISCONNECTING`);
+        })
 
         socket.on("disconnect",(reason)=>{
             resetStatus(user_id,group_id); 
@@ -87,9 +100,9 @@ module.exports = (io) => {
             if(reason === "client namespace disconnect"){
                 // Left the game for real
                 console.log(`Informing opponent in game ${gameId}`)
-                tttNamespace.to(gameId).emit("game-status",{opponent_status:"left"});
+                tttNamespace.to(gameId).emit("game-status",{opponent_status:"left", by : user_id});
             } else { 
-                tttNamespace.to(gameId).emit("game-status",{opponent_status:"lostConnection"});
+                tttNamespace.to(gameId).emit("game-status",{opponent_status:"disconnected", by: user_id});
             }
         })
 
