@@ -61,8 +61,8 @@ module.exports = (io) => {
                     messageId : x.messageId, 
                     by : x.by 
                 })
-                console.log(`Emitting event '${x.eventName}' with data ${x.data} with messageId ${messageId}`);
-            })
+                console.log(`Emitting event '${x.eventName}' with data ${x.data} with messageId ${x.messageId}`);
+            }) 
         }); 
         
         //After game starts     
