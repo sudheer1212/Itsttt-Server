@@ -51,6 +51,9 @@ module.exports = (io) => {
         socket.broadcast.to(gameId).emit("game-status", {opponent_status : "connected", by: user_id}); 
 
         socket.on("reconnected-user",(askFromMsgId)=>{  
+
+            console.log(
+            `${user_id} is asking for ${askFromMsgId} and array len is ${pubSubRoomData.pbArrayLength()}`)
             let arrayToSubscribe = pubSubRoomData.subscribeService(gameId, askFromMsgId); 
             arrayToSubscribe.forEach((x) => {
                 socket.to(socket.id).emit(x.eventName,{

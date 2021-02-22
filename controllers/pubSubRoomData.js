@@ -63,9 +63,14 @@ const deletePubSubRoom = (room) => {
     }
 }
 
+const pbArrayLength = (room)=>{ //for testing  
+    return pubSubRooms[room].psArray.length; 
+}
+
 module.exports = {
     publishService,
     subscribeService,
     makeRoomIfNotExists,
-    checkRoomExists
+    checkRoomExists,
+    pbArrayLength
 }
