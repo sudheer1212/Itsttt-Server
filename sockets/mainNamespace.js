@@ -37,8 +37,9 @@ module.exports = (io) => {
     io.on("connection",(socket)=>{
 
         let handshakeQuery = socket.handshake.query;
-        const { user_id,name } = handshakeQuery;
+        const { user_id, name, group_id } = handshakeQuery;
         console.log(`CONNECTED MAIN ${name} ${user_id} with socket ${socket.id}`); 
+        setSocketData(socket.id, user_id, group_id); 
 
         //NOT USING GLOBAL ROOM FOR NOW 
         socket.on("global-room",({user_id,name,group_id},callBack)=>{
@@ -113,11 +114,11 @@ module.exports = (io) => {
                 if(status === 1) { 
 
                     const gameId = uuidv4(); 
+                    console.log(`Game id made ${gameId}`); 
                     io.to(update_receiver.socket_id).emit("start",{ // To Request Sender
                         opponent : {
                             opponent_user_id : from.user_id,
                             opponent_name: from.name,
-                            opponent_socket_id : socket.id,
                             turn:1, //Request sender gets the first  turn
                             gameId 
                         }
@@ -126,7 +127,6 @@ module.exports = (io) => {
                         opponent : {
                             opponent_user_id : to.user_id,
                             opponent_name: to.name,
-                            opponent_socket_id : update_receiver.socket_id,
                             turn:0,
                             gameId
                         }
@@ -138,34 +138,6 @@ module.exports = (io) => {
             }
         }); 
 
-
-        //After game starts     
-        socket.on("game-status",(details)=>{
-            const { user_id, group_id, status_message, sharePlayMessageToGroup, opponent_socket_id } = details; 
-            if(status_message === "joined"){ 
-                io.to(`${group_id}-senders`).emit('update',{user_id,status:3});
-                addOnlinePlayer({user_id, group_id, socket_id:socket.id});
-                setOpponentSockets(socket.id, [opponent_socket_id]); 
-            } 
-            if(status_message === "left"){ 
-                io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
-                io.to(opponent_socket_id).emit("game-status",{opponent_status:"left"})
-                resetStatus(user_id,group_id); 
-                //removeOnlinePlayer({user_id, group_id, socket_id:socket.id}); 
-                resetOpponentSockets(socket.id); 
-            }  
-            if(sharePlayMessageToGroup){
-                shareMessageToGroup(user_id, group_id, sharePlayMessageToGroup); 
-            }
-            
-        });
-
-        //Between 2 people currently in the game
-        socket.on("game-step",(data)=>{
-            const {to,cell_no} = data; 
-            io.to(to.socket_id).emit("game-step",{cell_no}); 
-        }); 
-        
         socket.on("disconnect",(reason)=>{
             const data = getSocketData(socket.id);
             if(data) { 
