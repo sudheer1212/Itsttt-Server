@@ -53,7 +53,7 @@ module.exports = (io) => {
         socket.on("reconnected-user",(askFromMsgId)=>{  
 
             console.log(
-            `${user_id} is asking for ${askFromMsgId} and array len is ${pubSubRoomData.pbArrayLength()}`)
+            `${user_id} is asking for ${askFromMsgId} and array len is ${pubSubRoomData.pbArrayLength(gameId)}`)
             let arrayToSubscribe = pubSubRoomData.subscribeService(gameId, askFromMsgId); 
             arrayToSubscribe.forEach((x) => {
                 socket.to(socket.id).emit(x.eventName,{
@@ -61,6 +61,7 @@ module.exports = (io) => {
                     messageId : x.messageId, 
                     by : x.by 
                 })
+                console.log(`Emitting event '${x.eventName}' with data ${data} with messageId ${messageId}`);
             })
         }); 
         
