@@ -75,7 +75,7 @@ module.exports = (io) => {
 
         //Between 2 people currently in the game
         socket.on("game-step",(data,callback)=>{
-            let n = pubSubRoomData.publishService(gameId,"game-step",data); 
+            let n = pubSubRoomData.publishService(gameId,user_id,"game-step",data); 
             socket.broadcast.to(gameId).emit("game-step",{
                 data,
                 messageId : n,
