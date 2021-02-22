@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "devremote": "heroku git:remote -a itsttt-dev",
     "devdep": "git push heroku test:master",
+    "qdevdep": "git add . && git commit -m quickdeploy && git push heroku test:master",  
     "prodrempte": "heroku git:remote -a itsttt-dev",
     "dep": "git push heroku master",
     "log": "heroku logs --tail -a itsttt",
