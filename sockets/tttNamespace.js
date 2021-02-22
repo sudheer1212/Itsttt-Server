@@ -56,7 +56,7 @@ module.exports = (io) => {
             `${user_id} is asking for ${askFromMsgId} and array len is ${pubSubRoomData.pbArrayLength(gameId)}`)
             let arrayToSubscribe = pubSubRoomData.subscribeService(gameId, askFromMsgId); 
             arrayToSubscribe.forEach((x) => {
-                socket.to(socket.id).emit(x.eventName,{
+                tttNamespace.to(socket.id).emit(x.eventName,{
                     data  : x.data, 
                     messageId : x.messageId, 
                     by : x.by 
@@ -75,6 +75,7 @@ module.exports = (io) => {
 
         //Between 2 people currently in the game
         socket.on("game-step",(data,callback)=>{
+            console.log(`GAME STEP RECEIVED FROM ${user_id} DATA ${data.cell_no}`)
             let n = pubSubRoomData.publishService(gameId,user_id,"game-step",data); 
             socket.broadcast.to(gameId).emit("game-step",{
                 data,
