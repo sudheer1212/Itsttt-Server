@@ -79,7 +79,7 @@ module.exports = (io) => {
 
         //Between 2 people currently in the game
         socket.on("game-step",(data,callback)=>{
-            console.log(`GAME STEP RECEIVED FROM ${user_id} DATA ${data.cell_no}`)
+            console.log(`GAME STEP RECEIVED FROM ${user_id} DATA ${data.cell_no} TYPE ${data.type}`)
             let n = pubSubRoomData.publishService(gameId,user_id,"game-step",data); 
             socket.broadcast.to(gameId).emit("game-step",{
                 data,
