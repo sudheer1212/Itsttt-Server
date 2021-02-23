@@ -49,11 +49,12 @@ module.exports = (io) => {
         pubSubRoomData.makeRoomIfNotExists(gameId); 
         socket.join(gameId); 
 
+        //Spread the news
         addOnlinePlayer({user_id, group_id, socket_id:socket.id});
         io.to(`${group_id}-senders`).emit('update',{user_id,status:3});
         socket.broadcast.to(gameId).emit("game-status", {opponent_status : "connected", by: user_id}); 
 
-        socket.on("reconnected-user",(askFromMsgId)=>{  
+        socket.on("reconnect-ask-data",(askFromMsgId)=>{  
 
             console.log(
             `${user_id} is asking for ${askFromMsgId} and array len is ${pubSubRoomData.pbArrayLength(gameId)}`)
