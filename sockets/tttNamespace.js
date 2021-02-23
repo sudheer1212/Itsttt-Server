@@ -1,7 +1,9 @@
 const { 
     addOnlinePlayer,
     getOnlinePlayers,
-    resetStatus
+    resetStatus,
+    getLatestGameId,
+    updateLatestGameId 
 } = require("../controllers/globalStatusController"); //require("../controllers/onlinePlaying"); 
 
 const {
@@ -39,9 +41,10 @@ module.exports = (io) => {
 
     io.of("/ttt").on("connection",(socket)=>{
         let handshakeQuery = socket.handshake.query;
-        const { user_id, group_id, name, gameId } = handshakeQuery;
+        const { user_id, group_id, name } = handshakeQuery;
         console.log(`Handshake query ${JSON.stringify(handshakeQuery)}`); 
 
+        const gameId = getLatestGameId(group_id,user_id); 
         console.log(colors.bold.red(`Joined game id ${gameId}`)); 
         pubSubRoomData.makeRoomIfNotExists(gameId); 
         socket.join(gameId); 
@@ -93,15 +96,7 @@ module.exports = (io) => {
         socket.on("disconnect",(reason)=>{
             resetStatus(user_id,group_id); 
             io.to(`${group_id}-senders`).emit('update',{user_id,status:0});
-            
-            const data = getSocketData(socket.id);
-            if(data) { 
-                const {name,user_id} = data
-                console.log(`DISCONNECT TTT ${name} REASON :${reason}`);
-            } else { 
-                console.log(`DISCONNECT TTT UNKNOWN REASON :${reason}`); 
-            }
-
+            console.log(`DISCONNECT ${user_id} TTT UNKNOWN REASON :${reason}`); 
             if(reason === "client namespace disconnect"){
                 // Left the game for real
                 console.log(`Informing opponent in game ${gameId}`)

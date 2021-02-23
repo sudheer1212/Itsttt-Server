@@ -8,7 +8,8 @@ const {
     resetStatus, 
     addRequestSender,
     removeRequestSender,
-    getRequestSender
+    getRequestSender,
+    updateLatestGameId
 } = require("../controllers/globalStatusController"); //require("../controllers/requestSender")
 const {
     addRequestListener,
@@ -113,10 +114,14 @@ module.exports = (io) => {
             const { group_id, from, to, status} = responseObject; 
             const update_receiver = getRequestSender({user_id:to.user_id,group_id});
             if(update_receiver) { 
-                if(status === 1) { 
+                if(status === 1 && 1) { //add update receiver status here 
 
                     const gameId = uuidv4(); 
+                    updateLatestGameId(group_id,from.user_id,gameId); 
+                    updateLatestGameId(group_id,to.user_id,gameId); 
+                    
                     console.log(`Game id made ${gameId}`); 
+
                     io.to(update_receiver.socket_id).emit("start",{ // To Request Sender
                         opponent : {
                             opponent_user_id : from.user_id,
@@ -125,7 +130,7 @@ module.exports = (io) => {
                         },
                         gameId : gameId
                     }); 
-                    io.to(socket.id).emit("start",{  //To Request Laistener
+                    io.to(socket.id).emit("start",{  //To Request Listener
                         opponent : {
                             opponent_user_id : to.user_id,
                             opponent_name: to.name,
@@ -133,8 +138,9 @@ module.exports = (io) => {
                         },
                         gameId : gameId
                     }); 
+
                     pubSubRoomData.makeRoomIfNotExists(gameId); 
-                    
+                    shareMessageToGroup(user_id, group_id, `${to.name} started playing Tic Tac Toe with ${to.name}`);
                 } else {
                     io.to(update_receiver.socket_id).emit("update",{user_id:from.user_id,status});
                 }
