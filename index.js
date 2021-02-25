@@ -15,7 +15,7 @@ const io = socketio(server,{
     credentials: true
     },
     pingInterval: 2000, //5000
-    pingTimeout: 3000   //5000
+    pingTimeout: 10000   //5000
 }); 
 
 app.use(express.json());
