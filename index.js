@@ -14,8 +14,8 @@ const io = socketio(server,{
     origin: "*", // put frontend url in production 
     credentials: true
     },
-    pingInterval: 2000, //5000
-    pingTimeout: 10000   //5000
+    pingInterval: 25000	, //5000
+    pingTimeout: 5000   //5000
 }); 
 
 app.use(express.json());
