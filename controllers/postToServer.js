@@ -15,7 +15,7 @@ const postData = async (body,route) => {
         return response.data; 
     } catch (err) { 
         console.log("Problem while sending post request,console log from postData func"); 
-        console.log(err); 
+        //console.log(err); 
         return 0; 
     }
 }
@@ -33,7 +33,7 @@ const shareMessageToGroup = async(uuid, groupId, message) => {
         return res; 
     } catch(err) { 
         console.log("Problem while sending post request"); 
-        console.log(err); 
+        //console.log(err); 
     }
 }
 

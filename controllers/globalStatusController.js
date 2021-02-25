@@ -1,8 +1,13 @@
 // Sample
 // players and statuses = { 
 //     group_1 : { 
-//         user_12 : 123_socket_id_12323,
+//         user_12 : {
+//              123_socket_id_12323
+//              name,
+//              status
+//         },
 //         user_13 : 123_socket_id_233434,
+//     
 //     }
 //     group_2 : { 
 //         user_22 : 123_socket_id_34234,
@@ -33,12 +38,16 @@ let globalStatusObject = {
 
 const updatePlayerStatus = (user_id,group_id,socket_id,status) => { 
     if(!globalStatusObject[group_id]) {
-        globalStatusObject[group_id] = {}; 
+        globalStatusObject[group_id] = {
+           
+        }; 
     }
-    globalStatusObject[group_id][user_id] =  {
-        socket_id,
-        status
+    if(!globalStatusObject[group_id][user_id]) {
+        globalStatusObject[group_id][user_id] = {}
     }
+
+    globalStatusObject[group_id][user_id].socket_id = socket_id;
+    globalStatusObject[group_id][user_id].status = status; 
     return 1; 
 }; 
 
@@ -128,6 +137,21 @@ const getOnlinePlayers = (group_id) => {
     return result
 }
 
+const updateLatestGameId = (group_id,user_id,gameId) => { 
+    if(!globalStatusObject[group_id] || !globalStatusObject[group_id][user_id]) {
+        return null; 
+    }
+    globalStatusObject[group_id][user_id].gameId = gameId; 
+}
+
+const getLatestGameId = (group_id,user_id) => { 
+    if(!globalStatusObject[group_id] || !globalStatusObject[group_id][user_id]) {
+        return null; 
+    }
+    return globalStatusObject[group_id][user_id].gameId; 
+}
+
+
 module.exports = { 
     addRequestSender,
     getRequestSender,
@@ -136,25 +160,7 @@ module.exports = {
     getRequestListener,
     addOnlinePlayer,
     getOnlinePlayers,
-    resetStatus
+    resetStatus,
+    updateLatestGameId,
+    getLatestGameId
 }
-
-/*
-OLD
-
-const removeRequestSender = ({user_id,group_id}) => {
-    log(user_id,"left sender");  
-    resetStatus(user_id,group_id); 
-}
-
-const removeOnlinePlayer = ({user_id,group_id,socket_id}) => { 
-    log(user_id,"left player"); 
-    resetStatus(user_id,group_id); 
-}
-
-
-const removeRequestListener = ({user_id,group_id}) => { 
-    log(user_id,"left listener"); 
-    resetStatus(user_id,group_id); 
-}
-*/
