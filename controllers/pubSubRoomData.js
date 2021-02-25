@@ -1,3 +1,5 @@
+const schedule = require('node-schedule');
+const deleteRoomAfterSeconds = 3600; 
 /*
 Schema : 
 
@@ -22,6 +24,24 @@ const pubSubRooms = {
 
 };
 
+const roomCleaner = () => { 
+    const rooms = Object.keys(pubSubRooms);
+    const timeNow = new Date();
+    rooms.forEach((room) => {
+        const secondsPassed = (timeNow - pubSubRooms[room].createdAt)/1000; 
+        if(secondsPassed > deleteRoomAfterSeconds) {  
+            console.log(`Deleting room ${room} after ${secondsPassed} seconds`); 
+            delete pubSubRooms[room]; 
+        }
+    })
+}
+
+
+schedule.scheduleJob('1 * * * *',()=>{ //every hour at minute 1
+    console.log("Running pubsub room cleaner job"); 
+    roomCleaner(); 
+})
+
 const makeRoomIfNotExists = (room) => { 
     if(!pubSubRooms[room]) { 
         pubSubRooms[room] = {
@@ -39,6 +59,7 @@ const checkRoomExists = (room) => {
 }
 
 const publishService = (room, userId, eventName, data) => { 
+    makeRoomIfNotExists(room);
     let n = pubSubRooms[room].psArray.length; 
     pubSubRooms[room].psArray.push({
         eventName,

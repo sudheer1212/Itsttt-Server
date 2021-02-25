@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "devremote": "heroku git:remote -a itsttt-dev",
     "devdep": "git push heroku test:master",
-    "qdevdep": "git add . && git commit -m quickdeploy && git push heroku test:master",  
+    "qdevdep": "git add . && git commit -m quickdeploy && git push heroku test:master",
     "prodrempte": "heroku git:remote -a itsttt-dev",
     "dep": "git push heroku master",
     "log": "heroku logs --tail -a itsttt",
@@ -24,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "node-schedule": "^2.0.0",
     "socket.io": "^3.1.0",
     "uuid": "^8.3.2"
   }
