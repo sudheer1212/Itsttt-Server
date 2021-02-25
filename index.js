@@ -14,7 +14,7 @@ const io = socketio(server,{
     origin: "*", // put frontend url in production 
     credentials: true
     },
-    pingInterval: 25000	, //5000
+    pingInterval: 10000	, //5000
     pingTimeout: 5000   //5000
 }); 
 
